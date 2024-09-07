@@ -142,6 +142,7 @@ export default function Workouts() {
             <Text style={[styles.h1, { marginBottom: 15 }]}>Today</Text>
 
             <FlatList
+                style={{ flex: 1 }}
                 contentContainerStyle={styles.cardContainer}
                 data={workouts}
                 renderItem={({ item }) => (
@@ -157,7 +158,7 @@ export default function Workouts() {
                                 Reps: {item.reps}
                             </Text>
                             <Pressable onPress={() => deleteWorkout(item.workout_name)} style={{ marginTop: 10 }}>
-                                <AntDesign name="delete" size={20} color="red" />
+                                {<AntDesign name="delete" size={20} color="red" />}
                             </Pressable>
                         </View>
                     </AccordionItem>
@@ -187,9 +188,9 @@ const styles = StyleSheet.create({
         color: "#fff"
     },
     cardContainer: {
-        flex: 1,
         padding: 10,
-        gap: 10
+        gap: 10,
+        marginBottom: 150
     },
     cardText: {
         color: "#fff",

@@ -9,6 +9,8 @@ import { Macro } from "../../types/db";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { format } from "date-fns";
 import Collapsible from "react-native-collapsible";
+import EvilIcons from '@expo/vector-icons/EvilIcons';
+
 
 function AccordionItem({ title, children }) {
     const [isCollapsed, setIsCollapsed] = useState(true);
@@ -73,6 +75,8 @@ export default function Macros() {
             Alert.alert("Error inserting data into food table.");
             console.log(insertError);
         }
+
+        retrieveMacrosByDate();
     };
 
     const date = format(new Date(), "yyyy-MM-dd");
@@ -92,11 +96,11 @@ export default function Macros() {
         setMacros(selectMacro);
     }
 
-    const deleteMacro = async (food_name: string) => {
+    const deleteMacro = async (food_id: number) => {
         const { error: deleteError } = await supabase
         .from("Macros")
         .delete()
-        .eq("food_name", food_name)
+        .eq("id", food_id)
         .eq("created_at", date)
         .eq("user_id", session.user.id);
 
@@ -143,7 +147,9 @@ export default function Macros() {
 
             <View style={{ flexDirection: "row", justifyContent: "center", gap: 30 }}>
                 <Pressable style={styles.button} onPress={addMacro} >
-                    <Text style={styles.buttonText}>Add Macro</Text>
+                    <Text style={styles.buttonText}>
+                        Add Macro
+                    </Text>
                 </Pressable>
                 <Pressable style={styles.button}>
                     <Link href={"/create/new_food"} style={styles.buttonText}>
@@ -155,6 +161,7 @@ export default function Macros() {
             <Text style={styles.h1}>Today</Text>
             <FlatList
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+                style={{ flex: 1 }}
                 contentContainerStyle={styles.cardContainer}
                 data={macros}
                 renderItem={({ item }) => (
@@ -175,7 +182,7 @@ export default function Macros() {
                             <Text style={styles.cardText}>
                                 Calories: {item.calories}
                             </Text>
-                            <Pressable onPress={() => deleteMacro(item.food_name)} style={{ marginTop: 10 }}>
+                            <Pressable onPress={() => deleteMacro(item.id)} style={{ marginTop: 10 }}>
                                 <AntDesign name="delete" size={20} color="red" />
                             </Pressable>
                         </View>
@@ -235,7 +242,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     cardContainer: {
-        flex: 1,
         padding: 10,
         gap: 10
     },
