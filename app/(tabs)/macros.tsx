@@ -9,8 +9,6 @@ import { Macro } from "../../types/db";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { format } from "date-fns";
 import Collapsible from "react-native-collapsible";
-import EvilIcons from '@expo/vector-icons/EvilIcons';
-
 
 function AccordionItem({ title, children }) {
     const [isCollapsed, setIsCollapsed] = useState(true);
@@ -112,6 +110,21 @@ export default function Macros() {
         }
     }
 
+    const deleteFoodByName = async (food_name: string) => {
+        const { error: deleteFoodError } = await supabase
+        .from("Food")
+        .delete()
+        .eq("food_name", food_name)
+        .eq("user_id", session.user.id);
+
+        if (deleteFoodError) {
+            Alert.alert("Error deleting food");
+            console.log(deleteFoodError);
+        } else {
+            retrieveFood();
+        }
+    }
+
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         retrieveFood();
@@ -124,6 +137,17 @@ export default function Macros() {
         retrieveMacrosByDate();
     },[]);
 
+    const renderItem = (item) => {
+        return (
+            <View style={styles.item}>
+                <Text>{item.food_name}</Text>
+                <Pressable onPress={() => deleteFoodByName(item.food_name)}>
+                    <AntDesign name="delete" size={15} color="red" />
+                </Pressable>
+            </View>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <Stack.Screen options={{ title: "Macros" }} />
@@ -132,6 +156,12 @@ export default function Macros() {
 
             <Dropdown 
                 style={styles.dropdown}
+                containerStyle={styles.dropdownContainer}
+                inputSearchStyle={{ borderRadius: 5, color: "white" }}
+                placeholderStyle={{ color: "white" }}
+                selectedTextStyle={{ color: "white" }}
+                activeColor="#333333"
+                itemTextStyle={{color: "#fff"}}
                 data={foods}
                 search
                 maxHeight={300}
@@ -140,6 +170,7 @@ export default function Macros() {
                 value={food}
                 placeholder="Select food"
                 searchPlaceholder="Search..."
+                renderItem={renderItem}
                 onChange={(item) => {
                     setFood(item.food_name);
                 }}
@@ -221,25 +252,20 @@ const styles = StyleSheet.create({
     dropdown: {
         margin: 15,
         height: 50,
-        backgroundColor: 'white',
+        backgroundColor: '#1E1E1E',
         borderRadius: 7,
         padding: 15,
+    },
+    dropdownContainer: {
+        backgroundColor: "#1E1E1E", 
+        borderRadius: 5, 
+        borderColor: "#1E1E1E",
     },
     item: {
         padding: 17,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-    },
-    placeholderStyle: {
-        fontSize: 16,
-    },
-    selectedTextStyle: {
-        fontSize: 16,
-    },
-    inputSearchStyle: {
-        height: 40,
-        fontSize: 16,
     },
     cardContainer: {
         padding: 10,
